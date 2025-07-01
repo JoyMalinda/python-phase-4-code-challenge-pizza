@@ -68,7 +68,7 @@ class RestaurantPizzas(Resource):
             db.session.commit()
 
             pizza = Pizza.query.get(pizza_id)
-            return make_response(pizza.to_dict(), 201)
+            return make_response(pizza.to_dict(rules=('-restaurant.restaurant_pizzas', '-pizza.restaurant_pizzas')), 201)
 
         except Exception as e:
             return make_response(jsonify({"errors": [str(e)]}), 400)

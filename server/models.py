@@ -23,6 +23,12 @@ class Restaurant(db.Model, SerializerMixin):
 
     serialize_rules = ('-restaurant_pizzas.restaurant',)
 
+    @validates('name', 'address')
+    def validate_strings(self, key, value):
+        if not value or not isinstance(value, str) or not value.strip():
+            raise ValueError(f"{key} is required.")
+        return value.strip()
+
     def __repr__(self):
         return f"<Restaurant {self.name}>"
 
@@ -37,6 +43,12 @@ class Pizza(db.Model, SerializerMixin):
     restaurant_pizzas = db.relationship('RestaurantPizza', back_populates="pizza", cascade="all, delete-orphan")
 
     serialize_rules = ('-restaurant_pizzas.pizza',)
+
+    @validates('name', 'ingredients')
+    def validate_strings(self, key, value):
+        if not value or not isinstance(value, str) or not value.strip():
+            raise ValueError(f"{key} is required.")
+        return value.strip()
 
     def __repr__(self):
         return f"<Pizza {self.name}, {self.ingredients}>"
@@ -58,6 +70,8 @@ class RestaurantPizza(db.Model, SerializerMixin):
 
     @validates('price')
     def validate_price(self, key, value):
+        if not isinstance(value, int):
+            raise ValueError('Price must be an integer')
         if value < 1 or value > 30:
             raise ValueError('Price must be between 1 and 30')
         return value
